@@ -8,6 +8,15 @@ import SearchForm from "../components/SearchForm";
 
 /* <=== HOME PAGE ===> */
 
+/*
+ * Task Requirement:
+ * Store favourites in localStorage so saved favourites are restored after a page refresh.
+ *
+ * Keeping the storage key in one constant avoids repeated string values and makes future
+ * changes safer if the key ever needs to be renamed.
+ */
+const FAVOURITES_STORAGE_KEY = "itunesFavourites";
+
 function HomePage() {
   /*
    * HomePage owns the main app state.
@@ -15,7 +24,28 @@ function HomePage() {
    */
   const [apiToken, setApiToken] = useState("");
   const [results, setResults] = useState([]);
-  const [favourites, setFavourites] = useState([]);
+
+  /*
+   * Task Requirement:
+   * Restore favourites from localStorage when the page first loads.
+   *
+   * React state still controls the favourites while the app is running.
+   * localStorage is only used to reload the previous favourites after refresh.
+   */
+  const [favourites, setFavourites] = useState(() => {
+    try {
+      const savedFavourites = localStorage.getItem(FAVOURITES_STORAGE_KEY);
+
+      return savedFavourites ? JSON.parse(savedFavourites) : [];
+    } catch (error) {
+      /*
+       * If localStorage contains broken data, the app should not crash.
+       * Starting with an empty list keeps the app usable.
+       */
+      return [];
+    }
+  });
+
   const [isLoadingToken, setIsLoadingToken] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,6 +61,17 @@ function HomePage() {
   useEffect(() => {
     getAppToken();
   }, []);
+
+  /*
+   * Task Requirement:
+   * Save the latest favourites list to localStorage whenever favourites change.
+   *
+   * This keeps the existing add/remove behaviour unchanged while making the list persist
+   * between browser refreshes.
+   */
+  useEffect(() => {
+    localStorage.setItem(FAVOURITES_STORAGE_KEY, JSON.stringify(favourites));
+  }, [favourites]);
 
   /* <=== GET APP TOKEN ===> */
 
