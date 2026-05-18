@@ -1,0 +1,23 @@
+{
+  "name": "itunes-capstone-frontend",
+  "version": "1.0.0",
+  "description": "React frontend for the iTunes Search API capstone project.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.1",
+    "axios": "^1.13.2",
+    "bootstrap": "^5.3.8",
+    "formik": "^2.4.9",
+    "react": "^19.2.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.10.1",
+    "vite": "^8.0.10"
+  },
+  "devDependencies": {}
+}
