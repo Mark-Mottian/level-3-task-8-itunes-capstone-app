@@ -22,6 +22,14 @@ const mediaOptions = [
   { value: "ebook", label: "Ebook" },
 ];
 
+/*
+ * Task Requirement:
+ * Add search term length validation.
+ *
+ * Keeping the limit in a constant avoids a "magic number" being repeated in the form logic.
+ */
+const MAX_SEARCH_TERM_LENGTH = 100;
+
 /* <=== SEARCH FORM COMPONENT ===> */
 
 function SearchForm({ onSearch, isSearching, tokenReady }) {
@@ -38,6 +46,13 @@ function SearchForm({ onSearch, isSearching, tokenReady }) {
     onSubmit: handleSubmit,
   });
 
+  /*
+   * Task Requirement:
+   * Show the user how close the search term is to the maximum allowed length.
+   */
+  const searchTermLength = formik.values.searchTerm.length;
+  const isSearchTermTooLong = searchTermLength > MAX_SEARCH_TERM_LENGTH;
+
   /* <=== FORM VALIDATION ===> */
 
   function validateSearchForm(values) {
@@ -49,6 +64,14 @@ function SearchForm({ onSearch, isSearching, tokenReady }) {
      */
     if (!values.searchTerm.trim()) {
       errors.searchTerm = "Enter a search term.";
+    }
+
+    /*
+     * Task Requirement:
+     * Block unnecessarily long search terms before the frontend sends a request.
+     */
+    if (values.searchTerm.length > MAX_SEARCH_TERM_LENGTH) {
+      errors.searchTerm = `Search term must be ${MAX_SEARCH_TERM_LENGTH} characters or fewer.`;
     }
 
     return errors;
@@ -74,7 +97,18 @@ function SearchForm({ onSearch, isSearching, tokenReady }) {
           <Row className="g-3 align-items-start">
             <Col md={7}>
               <Form.Group controlId="searchTerm">
-                <Form.Label className="fw-semibold">Search term</Form.Label>
+                <div className="d-flex justify-content-between align-items-center">
+                  <Form.Label className="fw-semibold">Search term</Form.Label>
+
+                  {/* Task Requirement: show a search term character count. */}
+                  <small
+                    className={
+                      isSearchTermTooLong ? "text-danger" : "text-muted"
+                    }
+                  >
+                    {searchTermLength}/{MAX_SEARCH_TERM_LENGTH}
+                  </small>
+                </div>
 
                 <Form.Control
                   name="searchTerm"
@@ -119,7 +153,11 @@ function SearchForm({ onSearch, isSearching, tokenReady }) {
               <Button
                 type="submit"
                 className="w-100"
-                disabled={isSearching || !tokenReady}
+                /*
+                 * Task Requirement:
+                 * Disable search when the search term is too long so invalid requests are not submitted.
+                 */
+                disabled={isSearching || !tokenReady || isSearchTermTooLong}
               >
                 {isSearching ? "Searching..." : "Search"}
               </Button>
