@@ -22,6 +22,14 @@ const VALID_MEDIA_TYPES = [
   "ebook",
 ];
 
+/*
+ * Task Requirement:
+ * Add search term length validation.
+ *
+ * The backend repeats the limit as a safety check in case someone bypasses the frontend.
+ */
+const MAX_SEARCH_TERM_LENGTH = 100;
+
 /* <=== RESULT NORMALIZER ===> */
 
 function normalizeItunesResult(item) {
@@ -104,6 +112,18 @@ export async function searchItunes(req, res) {
     if (!searchTerm) {
       return res.status(400).json({
         message: "Search term is required.",
+      });
+    }
+
+    /*
+     * Task Requirement:
+     * Reject overlong search terms on the backend as well.
+     *
+     * This protects the API even if a request is made without using the React form.
+     */
+    if (searchTerm.length > MAX_SEARCH_TERM_LENGTH) {
+      return res.status(400).json({
+        message: `Search term must be ${MAX_SEARCH_TERM_LENGTH} characters or fewer.`,
       });
     }
 
